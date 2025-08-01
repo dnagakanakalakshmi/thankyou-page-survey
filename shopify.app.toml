@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "2bd02124345c7d617f4d59c03ec494e3"
-application_url = "https://walnut-medications-party-fraction.trycloudflare.com"
+application_url = "https://thankyou-page-survey.onrender.com/"
 embedded = true
 name = "thankyou"
 handle = "thankyou-24"
@@ -23,9 +23,9 @@ scopes = "write_products, read_customers, write_customers, read_orders"
 
 [auth]
 redirect_urls = [
-  "https://walnut-medications-party-fraction.trycloudflare.com/auth/callback",
-  "https://walnut-medications-party-fraction.trycloudflare.com/auth/shopify/callback",
-  "https://walnut-medications-party-fraction.trycloudflare.com/api/auth/callback"
+  "https://thankyou-page-survey.onrender.com//auth/callback",
+  "https://thankyou-page-survey.onrender.com//auth/shopify/callback",
+  "https://thankyou-page-survey.onrender.com//api/auth/callback"
 ]
 
 [pos]
@@ -37,6 +37,6 @@ automatically_update_urls_on_dev = true
 include_config_on_deploy = true
 
 [app_proxy]
-url = "https://walnut-medications-party-fraction.trycloudflare.com"
+url = "https://thankyou-page-survey.onrender.com/"
 subpath = "thankyou"
 prefix = "a"
