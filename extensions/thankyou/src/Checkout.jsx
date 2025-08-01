@@ -42,7 +42,7 @@ function Extension() {
 
       try {
         const extractedCustomerId = customerId.replace('gid://shopify/Customer/', '');
-        const apiUrl = `https://thankyou-page-survey.onrender.com//app/getquestions?customerId=${extractedCustomerId}&shop=${shop}`;
+        const apiUrl = `https://thankyou-page-survey.onrender.com/app/getquestions?customerId=${extractedCustomerId}&shop=${shop}`;
         
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -78,7 +78,7 @@ function Extension() {
 
     try {
       const extractedCustomerId = customerId.replace('gid://shopify/Customer/', '');
-      const apiUrl = 'https://thankyou-page-survey.onrender.com//app/getquestions';
+      const apiUrl = 'https://thankyou-page-survey.onrender.com/app/getquestions';
       
       const response = await fetch(apiUrl, {
         method: 'POST',
