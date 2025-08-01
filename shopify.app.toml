@@ -3,7 +3,7 @@
 client_id = "2bd02124345c7d617f4d59c03ec494e3"
 application_url = "https://thankyou-page-survey.onrender.com/"
 embedded = true
-name = "thankyou"
+name = "Thank you page survey"
 handle = "thankyou-24"
 
 [webhooks]

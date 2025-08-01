@@ -31,7 +31,9 @@ function Extension() {
   const [error, setError] = React.useState("");
 
   const apiContext = useApi();
+  console.log("API Context:", apiContext);
   const customerId = apiContext?.buyerIdentity?.customer?.current?.id;
+  console.log("Customer ID:", customerId);
   const shop = apiContext?.shop?.myshopifyDomain;
 
   // Load unanswered questions
