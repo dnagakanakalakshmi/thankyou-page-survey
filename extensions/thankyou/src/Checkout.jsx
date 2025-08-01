@@ -3,13 +3,10 @@ import {
   TextField,
   Button,
   BlockStack,
-  InlineStack,
   Text,
-  Select,
   useApi,
   Heading,
   Banner,
-  View,
   Choice,
   ChoiceList
 } from '@shopify/ui-extensions-react/checkout';
@@ -29,21 +26,72 @@ function Extension() {
   const [saving, setSaving] = React.useState(false);
   const [showThankYou, setShowThankYou] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [customerId, setCustomerId] = React.useState(null);
 
   const apiContext = useApi();
-  console.log("API Context:", apiContext);
-  const customerId = apiContext?.buyerIdentity?.customer?.current?.id;
-  console.log("Customer ID:", customerId);
+  const contextCustomerId = apiContext?.buyerIdentity?.customer?.current?.id;
   const shop = apiContext?.shop?.myshopifyDomain;
+  
+  // Get order ID from orderConfirmation (available on thank you page)
+  const orderIdentityId = apiContext?.orderConfirmation?.current?.order?.id;
+  
+  // Extract numeric ID and format as proper Order ID
+  const numericOrderId = orderIdentityId?.replace('gid://shopify/OrderIdentity/', '');
+  const orderId = numericOrderId ? `gid://shopify/Order/${numericOrderId}` : null;
 
   // Load unanswered questions
   React.useEffect(() => {
-
-    const loadQuestions = async () => {
-      if (!customerId || !shop) return;
+    const getCustomerIdFromOrder = async () => {
+      if (!orderId || !shop) {
+        console.log("Missing orderId or shop for fallback customer lookup");
+        return null;
+      }
 
       try {
-        const extractedCustomerId = customerId.replace('gid://shopify/Customer/', '');
+        const apiUrl = `https://thankyou-page-survey.onrender.com/app/getcustomerid?orderId=${orderId}&shop=${shop}`;
+        
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          console.log("✅ Retrieved customer ID from order:", result.customerId);
+          return result.customerId;
+        } else {
+          console.error("❌ Failed to get customer ID from order:", result.error);
+          return null;
+        }
+      } catch (error) {
+        console.error("❌ Network error getting customer ID:", error);
+        return null;
+      }
+    };
+
+    const loadQuestions = async () => {
+      // First, determine the customer ID to use
+      let finalCustomerId = contextCustomerId;
+      
+      if (!finalCustomerId) {
+        console.log("🔍 Customer ID not found in context, trying to get from order...");
+        finalCustomerId = await getCustomerIdFromOrder();
+      }
+
+      if (!finalCustomerId || !shop) {
+        console.log("❌ No customer ID available and/or missing shop");
+        setLoading(false);
+        return;
+      }
+
+      // Update the state with the customer ID we found
+      setCustomerId(finalCustomerId);
+
+      try {
+        const extractedCustomerId = finalCustomerId.replace('gid://shopify/Customer/', '');
         const apiUrl = `https://thankyou-page-survey.onrender.com/app/getquestions?customerId=${extractedCustomerId}&shop=${shop}`;
         
         const response = await fetch(apiUrl, {
@@ -57,8 +105,6 @@ function Extension() {
 
         if (response.ok && result.questions) {
           setQuestions(result.questions);
-          // Don't show thank you banner if there are no questions
-          // Only show it when user completes answering questions
         } else {
           console.error("Error loading questions:", result.error);
           setError("Failed to load questions");
@@ -72,7 +118,7 @@ function Extension() {
     };
 
     loadQuestions();
-  }, [customerId, shop]);
+  }, [contextCustomerId, shop, orderId]);
 
   // Save individual answer immediately
   const saveAnswer = async (questionTitle, answer) => {
